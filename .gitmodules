@@ -1,0 +1,3 @@
+[submodule "go-crypto"]
+	path = go-crypto
+	url = https://github.com/alivanz/go-crypto
