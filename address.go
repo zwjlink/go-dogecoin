@@ -1,8 +1,6 @@
 package dogecoin
 
-import (
-	"github.com/alivanz/go-crypto/bitcoin/base58"
-)
+import "github.com/freddyisman/go-dogecoin/base58"
 
 func AddressToPubKeyHash(address string) ([]byte, error) {
 	return base58.Decode(address)

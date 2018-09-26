@@ -21,4 +21,5 @@ func TestGetAddressData(t *testing.T) {
 	for _, row := range unspent.UnspentOutputs {
 		log.Printf("%v %v", row.TxHash, row.TxOutputN)
 	}
+	log.Println("DGZvtQkZo8dGhpn8DqAHNUjmQVrbAFGHQi")
 }
