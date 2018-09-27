@@ -13,6 +13,8 @@ func TestGetAddressData(t *testing.T) {
 	ErrorCheck(err)
 	p2pkh := P2PKH(BinAddressPubKeyHash(BinAddress))
 	log.Println(hex.EncodeToString(p2pkh))
+	unspent := GetUnspent("DGZvtQkZo8dGhpn8DqAHNUjmQVrbAFGHQi")
+	log.Printf("%v", unspent.UnspentOutputs[0].Script)
 }
 
 // BinAddress, err := base58.Decode("DGZvtQkZo8dGhpn8DqAHNUjmQVrbAFGHQi")

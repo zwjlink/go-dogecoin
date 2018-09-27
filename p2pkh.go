@@ -14,7 +14,7 @@ func P2PKH(pubkeyhash []byte) []byte {
 	p2pkh[1] = OP_HASH160
 	p2pkh[2] = byte(len(pubkeyhash))
 	for i := 0; i < 20; i++ {
-		p2pkh[2+i] = pubkeyhash[i]
+		p2pkh[3+i] = pubkeyhash[i]
 	}
 	p2pkh[23] = OP_EQUALVERIFY
 	p2pkh[24] = OP_CHECKSIG
