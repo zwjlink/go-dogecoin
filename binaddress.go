@@ -1,6 +1,6 @@
 package dogecoin
 
-func BinAddressNetworkCode(address []byte) byte {
+func BinAddressNetworkID(address []byte) byte {
 	return address[0]
 }
 

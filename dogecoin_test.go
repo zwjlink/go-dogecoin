@@ -1,21 +1,41 @@
 package dogecoin
 
 import (
-	"encoding/hex"
 	"log"
 	"testing"
-
-	"github.com/alivanz/go-crypto/bitcoin/base58"
 )
 
-func TestGetAddressData(t *testing.T) {
-	BinAddress, err := base58.Decode("DGZvtQkZo8dGhpn8DqAHNUjmQVrbAFGHQi")
-	ErrorCheck(err)
-	p2pkh := P2PKH(BinAddressPubKeyHash(BinAddress))
-	log.Println(hex.EncodeToString(p2pkh))
-	unspent := GetUnspent("DGZvtQkZo8dGhpn8DqAHNUjmQVrbAFGHQi")
-	log.Printf("%v", unspent.UnspentOutputs[0].Script)
+func TestGetUnspentData(t *testing.T) {
+	unspent := GetUnspent("DMr3fEiVrPWFpoCWS958zNtqgnFb7QWn9D")
+	OrderUnspent(&unspent)
+	input, change := InputTemplate(1500000000000, unspent)
+	for _, row := range unspent.UnspentOutputs {
+		log.Printf("%v %v %v", row.TxHash, row.TxOutputN, row.Value)
+	}
+	log.Print(input)
+	log.Print(change)
 }
+
+// unspent := GetUnspent("DMr3fEiVrPWFpoCWS958zNtqgnFb7QWn9D")
+// for _, row := range unspent.UnspentOutputs {
+// 	log.Printf("%v %v %v", row.TxHash, row.TxOutputN, row.Value)
+// }
+// OrderUnspent(&unspent)
+// log.Println("")
+
+// reversed := ReverseHex("76a91499b1ebcfc11a13df5161aba8160460fe1601d54188ac")
+// log.Println(reversed)
+
+// bytepresent, err := hex.DecodeString("ffffffff")
+// ErrorCheck(err)
+// log.Printf("%v", bytepresent)
+
+// BinAddress, err := base58.Decode("DGZvtQkZo8dGhpn8DqAHNUjmQVrbAFGHQi")
+// ErrorCheck(err)
+// p2pkh := P2PKH(BinAddressPubKeyHash(BinAddress))
+// log.Println(hex.EncodeToString(p2pkh))
+// unspent := GetUnspent("DGZvtQkZo8dGhpn8DqAHNUjmQVrbAFGHQi")
+// log.Printf("%v", unspent.UnspentOutputs[0].Script)
 
 // BinAddress, err := base58.Decode("DGZvtQkZo8dGhpn8DqAHNUjmQVrbAFGHQi")
 // ErrorCheck(err)
