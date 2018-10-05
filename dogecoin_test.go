@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetUnspentData(t *testing.T) {
-	var signature, pubkey, scriptsig string
+	// var signature, pubkey, scriptsig string
 	unspent := GetUnspent("DMr3fEiVrPWFpoCWS958zNtqgnFb7QWn9D")
 	OrderUnspent(&unspent)
 	for _, row := range unspent.UnspentOutputs {
@@ -23,10 +23,10 @@ func TestGetUnspentData(t *testing.T) {
 	rawtxhash := Hash(rawtxbyte)
 	log.Println(hex.EncodeToString(rawtxhash))
 	/*signing process*/
-	//add here
+	// add here
 	/*create signed transaction*/
-	ScriptSig(signature, pubkey)
-	signtx, change := CreateSignedTransaction(unspent, dest, scriptsig)
-	log.Println(signtx)
-	log.Println(change)
+	// ScriptSig(r, s, pubkey)
+	// signtx, change := CreateSignedTransaction(unspent, dest, scriptsig)
+	// log.Println(signtx)
+	// log.Println(change)
 }

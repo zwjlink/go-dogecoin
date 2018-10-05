@@ -8,8 +8,12 @@ import (
 	"github.com/alivanz/go-crypto/bitcoin/base58"
 )
 
-const fee uint64 = 1000000
-const sighashcode = "01"
+const (
+	fee         uint64 = 1000000
+	sighashcode        = "01"
+	header             = "30"
+	integer            = "02"
+)
 
 type UnspentOutput struct {
 	TxHash        string `json:"tx_hash"`
@@ -99,11 +103,24 @@ func OutputTemplate(dest []Destination) string {
 	return outputfinal.String()
 }
 
-func ScriptSig(signature string, pubkey string) string {
-	var scriptsig bytes.Buffer
-	scriptsig.WriteString(VarInt((len(signature) / 2) + 1))
-	scriptsig.WriteString(signature)
-	scriptsig.WriteString(sighashcode)
+func ScriptSig(r, s, pubkey string) string {
+	var sign, signfinal, scriptsig bytes.Buffer
+
+	sign.WriteString(integer)
+	sign.WriteString(VarInt(len(r) / 2))
+	sign.WriteString(r)
+	sign.WriteString(integer)
+	sign.WriteString(VarInt(len(s) / 2))
+	sign.WriteString(s)
+
+	signfinal.WriteString(header)
+	signfinal.WriteString(VarInt(len(sign.String()) / 2))
+	signfinal.WriteString(sign.String())
+	signfinal.WriteString(sighashcode)
+
+	scriptsig.WriteString(VarInt(len(signfinal.String()) / 2))
 	scriptsig.WriteString(VarInt(len(pubkey) / 2))
+	scriptsig.WriteString(pubkey)
+
 	return scriptsig.String()
 }
