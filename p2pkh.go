@@ -1,24 +1,27 @@
 package dogecoin
 
-const (
-	OP_DUP         byte = 0x76
-	OP_HASH160     byte = 0xa9
-	OP_EQUALVERIFY byte = 0x88
-	OP_CHECKSIG    byte = 0xac
-	//OP_TRUE        byte = 0x51
+import (
+	"bytes"
+	"fmt"
 )
 
-func P2PKH(pubkeyhash []byte) []byte {
-	p2pkh := make([]byte, 25)
-	p2pkh[0] = OP_DUP
-	p2pkh[1] = OP_HASH160
-	p2pkh[2] = byte(len(pubkeyhash))
-	for i := 0; i < 20; i++ {
-		p2pkh[3+i] = pubkeyhash[i]
-	}
-	p2pkh[23] = OP_EQUALVERIFY
-	p2pkh[24] = OP_CHECKSIG
-	return p2pkh
+const (
+	OP_DUP         = "76"
+	OP_HASH160     = "a9"
+	OP_EQUALVERIFY = "88"
+	OP_CHECKSIG    = "ac"
+	OP_TRUE        = "51"
+)
+
+func P2PKH(pubkeyhash string) string {
+	var p2pkh bytes.Buffer
+	p2pkh.WriteString(OP_DUP)
+	p2pkh.WriteString(OP_HASH160)
+	p2pkh.WriteString(fmt.Sprintf("%x", len(pubkeyhash)/2))
+	p2pkh.WriteString(pubkeyhash)
+	p2pkh.WriteString(OP_EQUALVERIFY)
+	p2pkh.WriteString(OP_CHECKSIG)
+	return p2pkh.String()
 }
 
 // Anyone-Can-Spend Outputs

@@ -1,11 +1,34 @@
 package dogecoin
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
 )
+
+func VarInt(num int) string {
+	var numstring, numfinal bytes.Buffer
+	if (len(fmt.Sprint(num)) % 2) > 0 {
+		numstring.WriteString("0" + fmt.Sprintf("%x", num))
+	} else {
+		numstring.WriteString(fmt.Sprintf("%x", num))
+	}
+	//numfinal.WriteString(prefix)
+	switch {
+	case num <= 0xfc:
+		//do nothing
+	case num <= 0xffff:
+		numfinal.WriteString("fd")
+	case num <= 0xffffffff:
+		numfinal.WriteString("fe")
+	default:
+		numfinal.WriteString("ff")
+	}
+	numfinal.WriteString(ReverseHex(numstring.String()))
+	return numfinal.String()
+}
 
 func StrToInt(doge_value string) uint64 {
 	var value uint64

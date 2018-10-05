@@ -1,13 +1,13 @@
 package dogecoin
 
-func BinAddressNetworkID(address []byte) byte {
-	return address[0]
+func BinAddressNetworkID(binaddress string) string {
+	return binaddress[0:1]
 }
 
-func BinAddressCheckSum(address []byte) []byte {
-	return address[21:25]
+func BinAddressCheckSum(binaddress string) string {
+	return binaddress[42:50]
 }
 
-func BinAddressPubKeyHash(address []byte) []byte {
-	return address[1:21]
+func BinAddressPubKeyHash(binaddress string) string {
+	return binaddress[2:42]
 }
