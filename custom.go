@@ -15,7 +15,6 @@ func VarInt(num int) string {
 	} else {
 		numstring.WriteString(fmt.Sprintf("%x", num))
 	}
-	//numfinal.WriteString(prefix)
 	switch {
 	case num <= 0xfc:
 		//do nothing

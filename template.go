@@ -35,7 +35,7 @@ func OrderUnspent(unspent *DogechainUnspent) {
 	}
 }
 
-func InputTemplate(sendvalue uint64, unspent DogechainUnspent) (string, string) {
+func InputTemplate(sendvalue uint64, unspent DogechainUnspent) (string, uint64) {
 	var input, inputfinal bytes.Buffer
 	var i int
 	sending := sendvalue + fee
@@ -63,7 +63,7 @@ func InputTemplate(sendvalue uint64, unspent DogechainUnspent) (string, string) 
 	input.WriteString("ffffffff")
 	inputfinal.WriteString(VarInt(i))
 	inputfinal.WriteString(input.String())
-	return inputfinal.String(), fmt.Sprintf("%v", change)
+	return inputfinal.String(), change
 }
 
 func OutputTemplate(dest []Destination) string {
