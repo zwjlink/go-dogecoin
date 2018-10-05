@@ -9,6 +9,7 @@ import (
 )
 
 const fee uint64 = 1000000
+const sighashcode = "01"
 
 type UnspentOutput struct {
 	TxHash        string `json:"tx_hash"`
@@ -35,7 +36,7 @@ func OrderUnspent(unspent *DogechainUnspent) {
 	}
 }
 
-func InputTemplate(sendvalue uint64, unspent DogechainUnspent) (string, uint64) {
+func InputTemplate(sendvalue uint64, unspent DogechainUnspent, scriptsig string) (string, uint64) {
 	var input, inputfinal bytes.Buffer
 	var i int
 	sending := sendvalue + fee
@@ -47,8 +48,13 @@ func InputTemplate(sendvalue uint64, unspent DogechainUnspent) (string, uint64) 
 			index = "0" + index
 		}
 		input.WriteString(ReverseHex(index))
-		input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
-		input.WriteString(unspent.UnspentOutputs[i].Script)
+		if scriptsig != "" {
+			input.WriteString(VarInt(len(scriptsig) / 2))
+			input.WriteString(scriptsig)
+		} else {
+			input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
+			input.WriteString(unspent.UnspentOutputs[i].Script)
+		}
 		input.WriteString("ffffffff")
 	}
 	change := StrToInt(unspent.UnspentOutputs[i].Value) - sending
@@ -58,8 +64,13 @@ func InputTemplate(sendvalue uint64, unspent DogechainUnspent) (string, uint64) 
 		index = "0" + index
 	}
 	input.WriteString(ReverseHex(index))
-	input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
-	input.WriteString(unspent.UnspentOutputs[i].Script)
+	if scriptsig != "" {
+		input.WriteString(VarInt(len(scriptsig) / 2))
+		input.WriteString(scriptsig)
+	} else {
+		input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
+		input.WriteString(unspent.UnspentOutputs[i].Script)
+	}
 	input.WriteString("ffffffff")
 	i++
 	inputfinal.WriteString(VarInt(i))
@@ -86,4 +97,13 @@ func OutputTemplate(dest []Destination) string {
 	outputfinal.WriteString(VarInt(i))
 	outputfinal.WriteString(output.String())
 	return outputfinal.String()
+}
+
+func ScriptSig(signature string, pubkey string) string {
+	var scriptsig bytes.Buffer
+	scriptsig.WriteString(VarInt((len(signature) / 2) + 1))
+	scriptsig.WriteString(signature)
+	scriptsig.WriteString(sighashcode)
+	scriptsig.WriteString(VarInt(len(pubkey) / 2))
+	return scriptsig.String()
 }
