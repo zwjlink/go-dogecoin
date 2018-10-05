@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/alivanz/go-crypto/bitcoin/base58"
+	"github.com/freddyisman/go-dogecoin/base58"
 )
 
 const (
