@@ -1,3 +1,4 @@
+//update v0.9
 package dogecoin
 
 import (
@@ -119,6 +120,7 @@ func ScriptSig(r, s, pubkey string) string {
 	signfinal.WriteString(sighashcode)
 
 	scriptsig.WriteString(VarInt(len(signfinal.String()) / 2))
+	scriptsig.WriteString(signfinal.String())
 	scriptsig.WriteString(VarInt(len(pubkey) / 2))
 	scriptsig.WriteString(pubkey)
 

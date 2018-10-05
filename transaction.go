@@ -1,3 +1,4 @@
+//update v0.9
 package dogecoin
 
 import "bytes"

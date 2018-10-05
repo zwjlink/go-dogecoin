@@ -1,3 +1,4 @@
+//update v0.9
 /*var dest []Destination
 or
 dest := make([]Destination, 0)*/
