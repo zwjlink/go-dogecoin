@@ -61,6 +61,7 @@ func InputTemplate(sendvalue uint64, unspent DogechainUnspent) (string, uint64) 
 	input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
 	input.WriteString(unspent.UnspentOutputs[i].Script)
 	input.WriteString("ffffffff")
+	i++
 	inputfinal.WriteString(VarInt(i))
 	inputfinal.WriteString(input.String())
 	return inputfinal.String(), change
