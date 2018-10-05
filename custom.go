@@ -3,19 +3,27 @@ package dogecoin
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 )
 
-func VarInt(num int) string {
-	var numstring, numfinal bytes.Buffer
+func EvenCorrect(num int) string {
+	var numstring bytes.Buffer
 	if (len(fmt.Sprint(num)) % 2) > 0 {
 		numstring.WriteString("0" + fmt.Sprintf("%x", num))
 	} else {
 		numstring.WriteString(fmt.Sprintf("%x", num))
 	}
+	return numstring.String()
+}
+
+func VarInt(num int) string {
+	var numstring, numfinal bytes.Buffer
+	numstring.WriteString(EvenCorrect(num))
 	switch {
 	case num <= 0xfc:
 		//do nothing
@@ -54,4 +62,16 @@ func ReverseHex(hexa string) string {
 	}
 	reversed := hex.EncodeToString(bytes)
 	return reversed
+}
+
+func Hash(data []byte) []byte {
+	hash1 := sha256.Sum256(data)
+	hash2 := sha256.Sum256(hash1[:])
+	return hash2[:]
+}
+
+func ErrorCheck(err error) {
+	if err != nil {
+		log.Println(err)
+	}
 }

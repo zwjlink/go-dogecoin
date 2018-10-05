@@ -14,6 +14,18 @@ const (
 	OP_TRUE        = "51"
 )
 
+func BinAddressNetworkID(binaddress string) string {
+	return binaddress[0:1]
+}
+
+func BinAddressCheckSum(binaddress string) string {
+	return binaddress[42:50]
+}
+
+func BinAddressPubKeyHash(binaddress string) string {
+	return binaddress[2:42]
+}
+
 func P2PKH(pubkeyhash string) string {
 	var p2pkh bytes.Buffer
 	p2pkh.WriteString(OP_DUP)
@@ -24,8 +36,3 @@ func P2PKH(pubkeyhash string) string {
 	p2pkh.WriteString(OP_CHECKSIG)
 	return p2pkh.String()
 }
-
-// Anyone-Can-Spend Outputs
-// func AnyoneCanSpent() []byte {
-// 	return []byte{OP_TRUE}
-// }
