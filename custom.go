@@ -13,7 +13,7 @@ import (
 
 func EvenCorrect(num int) string {
 	var numstring bytes.Buffer
-	if (len(fmt.Sprint(num)) % 2) > 0 {
+	if (len(fmt.Sprintf("%x", num)) % 2) > 0 {
 		numstring.WriteString("0" + fmt.Sprintf("%x", num))
 	} else {
 		numstring.WriteString(fmt.Sprintf("%x", num))

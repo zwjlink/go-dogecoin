@@ -3,7 +3,12 @@ package dogecoin
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+
+	"github.com/freddyisman/go-dogecoin/base58"
+	"golang.org/x/crypto/ripemd160"
 )
 
 const (
@@ -14,8 +19,28 @@ const (
 	OP_TRUE        = "51"
 )
 
+func PubKeyToAddress(pubkey string, addrID string) string {
+	var binaddress bytes.Buffer
+	ripemd := ripemd160.New()
+	pubkeybyte, err := hex.DecodeString(pubkey)
+	ErrorCheck(err)
+	firsthash := sha256.Sum256(pubkeybyte)
+	ripemd.Write(firsthash[:])
+	pubkeyhash := ripemd.Sum(nil)
+	binaddress.WriteString(addrID)
+	binaddress.WriteString(hex.EncodeToString(pubkeyhash))
+	binaddrnocek, err := hex.DecodeString(binaddress.String())
+	ErrorCheck(err)
+	checksum := Hash(binaddrnocek)[:4]
+	binaddress.WriteString(hex.EncodeToString(checksum))
+	binaddrbyte, err := hex.DecodeString(binaddress.String())
+	ErrorCheck(err)
+	address := base58.Encode(binaddrbyte)
+	return address
+}
+
 func BinAddressNetworkID(binaddress string) string {
-	return binaddress[0:1]
+	return binaddress[:2]
 }
 
 func BinAddressCheckSum(binaddress string) string {
