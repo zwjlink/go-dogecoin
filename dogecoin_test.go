@@ -9,24 +9,31 @@ import (
 
 func TestGetUnspentData(t *testing.T) {
 	// var pubkey, scriptsig string
-	unspent := GetUnspent("DMr3fEiVrPWFpoCWS958zNtqgnFb7QWn9D")
+	Address := "DPAQVCUVQU1LKRkeKihjYb2gDiHoLteSwR"
+	unspent := GetUnspent(Address)
+	balance := GetBalance(Address)
 	OrderUnspent(&unspent)
-	for _, row := range unspent.UnspentOutputs {
-		log.Printf("%v %v %v", row.TxHash, row.TxOutputN, row.Value)
-	}
+	// for _, row := range unspent.UnspentOutputs {
+	// 	log.Printf("%v %v %v", row.TxHash, row.TxOutputN, row.Value)
+	// }
 	dest := make([]Destination, 0)
-	dest = append(dest, Destination{"DGZvtQkZo8dGhpn8DqAHNUjmQVrbAFGHQi", 2570000000000})
-	dest = append(dest, Destination{"DRsLzWNubViGtLoxXnaNaMbvTiadMMsUYL", 1250000000000})
-	rawtransaction := CreateRawTransaction(unspent, &dest)
-	log.Println(rawtransaction)
-	rawtxbyte, err := hex.DecodeString(rawtransaction)
-	ErrorCheck(err)
-	rawtxhash := Hash(rawtxbyte)
-	log.Println(hex.EncodeToString(rawtxhash))
+	sendvalue := uint64(6300000000)
+	log.Printf("sendvalue : %v\n", sendvalue)
+	dest = append(dest, Destination{"DBHdUWoMQAAt4CgCfWztwRovxhQQ9qo5Um", sendvalue})
+	rawtransaction, change := CreateRawTransaction(unspent, balance, &dest)
+	log.Printf("rawtxhex  : %v\n", rawtransaction)
+	if rawtransaction == "saldo tidak mencukupi" {
+		log.Printf("balance   : %v\n", change)
+	} else {
+		log.Printf("change    : %v\n", change)
+		rawtxbyte, err := hex.DecodeString(rawtransaction)
+		ErrorCheck(err)
+		rawtxhash := Hash(rawtxbyte)
+		log.Printf("rawtxhash : %v", hex.EncodeToString(rawtxhash))
+	}
 	// r, s, err := ecdsa.Sign(rand.Reader, /*privatekey*/, rawtxhash)
 	// ErrorCheck(err)
 	// ScriptSig(EvenCorrect(r), EvenCorrect(s), /*pubkey*/)
 	// signtx, change := CreateSignedTransaction(unspent, dest, scriptsig)
 	// log.Println(signtx)
-	// log.Println(change)
 }

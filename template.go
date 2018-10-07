@@ -41,14 +41,34 @@ func OrderUnspent(unspent *DogechainUnspent) {
 	}
 }
 
-func InputTemplate(sendvalue uint64, unspent DogechainUnspent, scriptsig string) (string, uint64) {
+func InputTemplate(sendvalue uint64, unspent DogechainUnspent, balance DogechainBalance, scriptsig string) (string, uint64) {
 	var input, inputfinal bytes.Buffer
 	var i int
+	var index string
 	sending := sendvalue + fee
-	for i = 0; sending > StrToInt(unspent.UnspentOutputs[i].Value); i++ {
-		sending = sending - StrToInt(unspent.UnspentOutputs[i].Value)
+	if StrToInt(balance.Balance) < sending {
+		return "saldo tidak mencukupi", StrToInt(balance.Balance)
+	} else {
+		for i = 0; sending > StrToInt(unspent.UnspentOutputs[i].Value); i++ {
+			sending = sending - StrToInt(unspent.UnspentOutputs[i].Value)
+			input.WriteString(ReverseHex(unspent.UnspentOutputs[i].TxHash))
+			index = fmt.Sprintf("%x", unspent.UnspentOutputs[i].TxOutputN)
+			for len(index) < 8 {
+				index = "0" + index
+			}
+			input.WriteString(ReverseHex(index))
+			if scriptsig != "" {
+				input.WriteString(VarInt(len(scriptsig) / 2))
+				input.WriteString(scriptsig)
+			} else {
+				input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
+				input.WriteString(unspent.UnspentOutputs[i].Script)
+			}
+			input.WriteString("ffffffff")
+		}
+		change := StrToInt(unspent.UnspentOutputs[i].Value) - sending
 		input.WriteString(ReverseHex(unspent.UnspentOutputs[i].TxHash))
-		index := fmt.Sprintf("%x", unspent.UnspentOutputs[i].TxOutputN)
+		index = fmt.Sprintf("%x", unspent.UnspentOutputs[i].TxOutputN)
 		for len(index) < 8 {
 			index = "0" + index
 		}
@@ -61,41 +81,27 @@ func InputTemplate(sendvalue uint64, unspent DogechainUnspent, scriptsig string)
 			input.WriteString(unspent.UnspentOutputs[i].Script)
 		}
 		input.WriteString("ffffffff")
+		i++
+		inputfinal.WriteString(VarInt(i))
+		inputfinal.WriteString(input.String())
+		return inputfinal.String(), change
 	}
-	change := StrToInt(unspent.UnspentOutputs[i].Value) - sending
-	input.WriteString(ReverseHex(unspent.UnspentOutputs[i].TxHash))
-	index := fmt.Sprintf("%x", unspent.UnspentOutputs[i].TxOutputN)
-	for len(index) < 8 {
-		index = "0" + index
-	}
-	input.WriteString(ReverseHex(index))
-	if scriptsig != "" {
-		input.WriteString(VarInt(len(scriptsig) / 2))
-		input.WriteString(scriptsig)
-	} else {
-		input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
-		input.WriteString(unspent.UnspentOutputs[i].Script)
-	}
-	input.WriteString("ffffffff")
-	i++
-	inputfinal.WriteString(VarInt(i))
-	inputfinal.WriteString(input.String())
-	return inputfinal.String(), change
 }
 
 func OutputTemplate(dest []Destination) string {
 	var output, outputfinal bytes.Buffer
 	var i int
+	var value, pubkeyhash, scriptpubkey string
 	for i = 0; i < len(dest); i++ {
-		value := fmt.Sprintf("%x", dest[i].Value)
+		value = fmt.Sprintf("%x", dest[i].Value)
 		for len(value) < 16 {
 			value = "0" + value
 		}
 		output.WriteString(ReverseHex(value))
 		binaddress, err := base58.Decode(dest[i].Address)
 		ErrorCheck(err)
-		pubkeyhash := BinAddressPubKeyHash(hex.EncodeToString(binaddress))
-		scriptpubkey := P2PKH(pubkeyhash)
+		pubkeyhash = BinAddressPubKeyHash(hex.EncodeToString(binaddress))
+		scriptpubkey = P2PKH(pubkeyhash)
 		output.WriteString(VarInt(len(scriptpubkey) / 2))
 		output.WriteString(scriptpubkey)
 	}
