@@ -21,13 +21,14 @@ const (
 func TestGetUnspentData(t *testing.T) {
 	var pubkey bytes.Buffer
 	var balance DogechainBalance
-	privkey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	random := rand.Reader
+	privkey, err := ecdsa.GenerateKey(elliptic.P256(), random)
 	ErrorCheck(err)
 	pubkey.WriteString(uncompressed)
 	pubkey.WriteString(fmt.Sprintf("%x%x", (*privkey).PublicKey.X, (*privkey).PublicKey.Y))
 	Address := PubKeyToAddress(pubkey.String(), addrID)
-	sendvalue := uint64(27000000)
-	destaddress := "DBHdUWoMQAAt4CgCfWztwRovxhQQ9qo5Um"
+	sendvalue := uint64(870000000)
+	destaddress := "DPAQVCUVQU1LKRkeKihjYb2gDiHoLteSwR"
 	log.Printf("NetworkID    : %v\n", addrID)
 	log.Printf("myprivatekey : %x\n", privkey.D)
 	log.Printf("mypublickey  : %v\n", pubkey.String())
@@ -44,13 +45,13 @@ func TestGetUnspentData(t *testing.T) {
 	dest = append(dest, Destination{destaddress, sendvalue})
 	rawtx, change := CreateRawTransaction(unspent, balance, &dest)
 	log.Printf("rawtxhex     : %v\n", rawtx)
-	log.Printf("change       : %v\n", change)
 	if rawtx != "saldo tidak mencukupi" {
+		log.Printf("change       : %v\n", change)
 		rawtxbyte, err := hex.DecodeString(rawtx)
 		ErrorCheck(err)
 		rawtxhash := Hash(rawtxbyte)
 		log.Printf("rawtxhash    : %v", hex.EncodeToString(rawtxhash))
-		r, s, err := ecdsa.Sign(rand.Reader, privkey, rawtxhash)
+		r, s, err := ecdsa.Sign(random, privkey, rawtxhash)
 		ErrorCheck(err)
 		scriptsig := ScriptSig(fmt.Sprintf("%x", r), fmt.Sprintf("%x", s), pubkey.String())
 		signtx, change := CreateSignedTransaction(unspent, balance, dest, scriptsig)

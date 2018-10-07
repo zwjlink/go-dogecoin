@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	fee         uint64 = 3400000
+	fee         uint64 = 34000
 	sighashcode        = "01"
 	header             = "30"
 	integer            = "02"
