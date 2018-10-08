@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	"github.com/freddyisman/go-dogecoin/base58"
 	"golang.org/x/crypto/ripemd160"
@@ -17,9 +18,26 @@ const (
 	OP_EQUALVERIFY = "88"
 	OP_CHECKSIG    = "ac"
 	OP_TRUE        = "51"
+	addrID         = "1e"
 )
 
-func PubKeyToAddress(pubkey string, addrID string) string {
+func Compressed(x, y string, compress int) string {
+	var pubkey string
+	if compress == 0 {
+		pubkey = "04" + x + y
+	} else if compress == 1 {
+		suffix, err := strconv.ParseUint(y[len(y)-1:len(y)], 16, 64)
+		ErrorCheck(err)
+		if suffix%2 == 0 {
+			pubkey = "02" + x
+		} else {
+			pubkey = "03" + x
+		}
+	}
+	return pubkey
+}
+
+func PubKeyToAddress(pubkey string) string {
 	var binaddress bytes.Buffer
 	ripemd := ripemd160.New()
 	pubkeybyte, err := hex.DecodeString(pubkey)

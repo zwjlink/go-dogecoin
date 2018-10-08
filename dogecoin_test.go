@@ -13,21 +13,17 @@ import (
 	"time"
 )
 
-const (
-	addrID       = "1e"
-	uncompressed = "04"
-)
-
 func TestGetUnspentData(t *testing.T) {
 	var pubkey bytes.Buffer
 	var balance DogechainBalance
 	random := rand.Reader
 	privkey, err := ecdsa.GenerateKey(elliptic.P256(), random)
 	ErrorCheck(err)
-	pubkey.WriteString(uncompressed)
-	pubkey.WriteString(fmt.Sprintf("%x%x", (*privkey).PublicKey.X, (*privkey).PublicKey.Y))
-	Address := PubKeyToAddress(pubkey.String(), addrID)
-	sendvalue := uint64(270000000)
+	x := fmt.Sprintf("%x", (*privkey).PublicKey.X)
+	y := fmt.Sprintf("%x", (*privkey).PublicKey.Y)
+	pubkey.WriteString(Compressed(x, y, 1))
+	Address := PubKeyToAddress(pubkey.String())
+	sendvalue := uint64(170000000)
 	destaddress := "DPAQVCUVQU1LKRkeKihjYb2gDiHoLteSwR"
 	log.Printf("NetworkID    : %v\n", addrID)
 	log.Printf("myprivatekey : %x\n", privkey.D)
