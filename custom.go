@@ -11,6 +11,20 @@ import (
 	"strings"
 )
 
+const signlim = 0x7f
+
+func SignCorrect(sign string) string {
+	for len(sign) < 64 {
+		sign = "0" + sign
+	}
+	prefix, err := strconv.ParseUint(sign[:2], 16, 64)
+	ErrorCheck(err)
+	if prefix >= signlim {
+		sign = "00" + sign
+	}
+	return sign
+}
+
 func EvenCorrect(num int) string {
 	var numstring bytes.Buffer
 	if (len(fmt.Sprintf("%x", num)) % 2) > 0 {

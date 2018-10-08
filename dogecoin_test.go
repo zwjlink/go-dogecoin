@@ -27,7 +27,7 @@ func TestGetUnspentData(t *testing.T) {
 	pubkey.WriteString(uncompressed)
 	pubkey.WriteString(fmt.Sprintf("%x%x", (*privkey).PublicKey.X, (*privkey).PublicKey.Y))
 	Address := PubKeyToAddress(pubkey.String(), addrID)
-	sendvalue := uint64(870000000)
+	sendvalue := uint64(270000000)
 	destaddress := "DPAQVCUVQU1LKRkeKihjYb2gDiHoLteSwR"
 	log.Printf("NetworkID    : %v\n", addrID)
 	log.Printf("myprivatekey : %x\n", privkey.D)
@@ -53,9 +53,13 @@ func TestGetUnspentData(t *testing.T) {
 		log.Printf("rawtxhash    : %v", hex.EncodeToString(rawtxhash))
 		r, s, err := ecdsa.Sign(random, privkey, rawtxhash)
 		ErrorCheck(err)
-		scriptsig := ScriptSig(fmt.Sprintf("%x", r), fmt.Sprintf("%x", s), pubkey.String())
+		r_correct := SignCorrect(fmt.Sprintf("%x", r))
+		s_correct := SignCorrect(fmt.Sprintf("%x", s))
+		scriptsig := ScriptSig(r_correct, s_correct, pubkey.String())
 		signtx, change := CreateSignedTransaction(unspent, balance, dest, scriptsig)
 		log.Printf("signtxhex    : %v\n", signtx)
 		log.Printf("change       : %v\n", change)
+		valid := ecdsa.Verify(&privkey.PublicKey, rawtxhash, r, s)
+		log.Println("signature verified:", valid)
 	}
 }
