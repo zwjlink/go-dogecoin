@@ -4,20 +4,21 @@ package dogecoin
 import (
 	"bytes"
 	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"log"
 	"testing"
 	"time"
+
+	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 )
 
 func TestGetUnspentData(t *testing.T) {
 	var pubkey bytes.Buffer
 	var balance DogechainBalance
 	random := rand.Reader
-	privkey, err := ecdsa.GenerateKey(elliptic.P256(), random)
+	privkey, err := ecdsa.GenerateKey(secp256k1.S256(), random)
 	ErrorCheck(err)
 	x := fmt.Sprintf("%x", (*privkey).PublicKey.X)
 	y := fmt.Sprintf("%x", (*privkey).PublicKey.Y)
