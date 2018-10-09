@@ -24,7 +24,7 @@ func TestGetUnspentData(t *testing.T) {
 	y := fmt.Sprintf("%x", (*privkey).PublicKey.Y)
 	pubkey.WriteString(Compressed(x, y, 1))
 	Address := PubKeyToAddress(pubkey.String())
-	sendvalue := uint64(170000000)
+	sendvalue := uint64(2300000000)
 	destaddress := "DPAQVCUVQU1LKRkeKihjYb2gDiHoLteSwR"
 	log.Printf("NetworkID    : %v\n", addrID)
 	log.Printf("myprivatekey : %x\n", privkey.D)
