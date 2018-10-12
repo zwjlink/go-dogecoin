@@ -15,7 +15,7 @@ import (
 func TestGetUnspentData(t *testing.T) {
 	var pubkey bytes.Buffer
 	privkey := "e105500a65cd0eda7ec6784a27a09f20c725ade74ec7d1bd96d09318d0ed43a4"
-	sendvalue := uint64(50000000)
+	sendvalue := uint64(1000000000)
 	destaddress := "DPAQVCUVQU1LKRkeKihjYb2gDiHoLteSwR"
 	privkeybin, _ := hex.DecodeString(privkey)
 	wallet, _ := bitcoin.NewWallet(privkeybin)

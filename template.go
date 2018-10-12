@@ -44,12 +44,13 @@ func OrderUnspent(unspent *DogechainUnspent) {
 func InputTemplate(sendvalue uint64, unspent DogechainUnspent, balance DogechainBalance, scriptsig string) (string, uint64) {
 	var input, inputfinal bytes.Buffer
 	var i int
+	var change uint64
 	var index string
 	sending := sendvalue + fee
 	if StrToInt(balance.Balance) < sending {
 		return "saldo tidak mencukupi", StrToInt(balance.Balance)
 	} else {
-		for i = 0; sending > StrToInt(unspent.UnspentOutputs[i].Value); i++ {
+		for i = 0; sending >= StrToInt(unspent.UnspentOutputs[i].Value); i++ {
 			sending = sending - StrToInt(unspent.UnspentOutputs[i].Value)
 			input.WriteString(ReverseHex(unspent.UnspentOutputs[i].TxHash))
 			index = fmt.Sprintf("%x", unspent.UnspentOutputs[i].TxOutputN)
@@ -66,22 +67,24 @@ func InputTemplate(sendvalue uint64, unspent DogechainUnspent, balance Dogechain
 			}
 			input.WriteString("ffffffff")
 		}
-		change := StrToInt(unspent.UnspentOutputs[i].Value) - sending
-		input.WriteString(ReverseHex(unspent.UnspentOutputs[i].TxHash))
-		index = fmt.Sprintf("%x", unspent.UnspentOutputs[i].TxOutputN)
-		for len(index) < 8 {
-			index = "0" + index
+		if sending > 0 {
+			change = StrToInt(unspent.UnspentOutputs[i].Value) - sending
+			input.WriteString(ReverseHex(unspent.UnspentOutputs[i].TxHash))
+			index = fmt.Sprintf("%x", unspent.UnspentOutputs[i].TxOutputN)
+			for len(index) < 8 {
+				index = "0" + index
+			}
+			input.WriteString(ReverseHex(index))
+			if scriptsig != "" {
+				input.WriteString(VarInt(len(scriptsig) / 2))
+				input.WriteString(scriptsig)
+			} else {
+				input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
+				input.WriteString(unspent.UnspentOutputs[i].Script)
+			}
+			input.WriteString("ffffffff")
+			i++
 		}
-		input.WriteString(ReverseHex(index))
-		if scriptsig != "" {
-			input.WriteString(VarInt(len(scriptsig) / 2))
-			input.WriteString(scriptsig)
-		} else {
-			input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
-			input.WriteString(unspent.UnspentOutputs[i].Script)
-		}
-		input.WriteString("ffffffff")
-		i++
 		inputfinal.WriteString(VarInt(i))
 		inputfinal.WriteString(input.String())
 		return inputfinal.String(), change

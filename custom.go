@@ -67,7 +67,7 @@ func StrToInt(doge_value string) uint64 {
 }
 
 func IntToStr(doge_value uint64) string {
-	return fmt.Sprintf("%v.%v", doge_value/satoshi, doge_value%satoshi)
+	return fmt.Sprintf("%v.%08v", doge_value/satoshi, doge_value%satoshi)
 }
 
 func ReverseHex(hexa string) string {
