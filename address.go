@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/freddyisman/go-dogecoin/base58"
+	"github.com/alivanz/go-crypto/bitcoin/base58"
 	"golang.org/x/crypto/ripemd160"
 )
 
