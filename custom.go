@@ -12,6 +12,7 @@ import (
 )
 
 const signlim = 0x7f
+const satoshi = 100000000
 
 func SignCorrect(sign string) string {
 	for len(sign) < 64 {
@@ -63,6 +64,10 @@ func StrToInt(doge_value string) uint64 {
 		ErrorCheck(err)
 	}
 	return value
+}
+
+func IntToStr(doge_value uint64) string {
+	return fmt.Sprintf("%v.%v", doge_value/satoshi, doge_value%satoshi)
 }
 
 func ReverseHex(hexa string) string {
