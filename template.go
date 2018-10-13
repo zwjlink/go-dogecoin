@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	crypto "github.com/alivanz/go-crypto"
 	"github.com/alivanz/go-crypto/bitcoin/base58"
 )
 
@@ -30,6 +31,14 @@ type Destination struct {
 	Value   uint64
 }
 
+func CanSpent(balance DogechainBalance, sendvalue uint64) string {
+	if StrToInt(balance.Balance) < (sendvalue + fee) {
+		return "saldo tidak mencukupi"
+	} else {
+		return ""
+	}
+}
+
 func OrderUnspent(unspent *DogechainUnspent) {
 	var temp UnspentOutput
 	for i := 1; i < len((*unspent).UnspentOutputs); i++ {
@@ -41,54 +50,47 @@ func OrderUnspent(unspent *DogechainUnspent) {
 	}
 }
 
-func InputTemplate(sendvalue uint64, unspent DogechainUnspent, balance DogechainBalance, scriptsig string) (string, uint64) {
+func ChangeUnspent(sendvalue uint64, unspent *DogechainUnspent, dest *[]Destination) int {
+	var i int
+	sending := sendvalue + fee
+	for i = 0; sending >= StrToInt((*unspent).UnspentOutputs[i].Value); i++ {
+		sending = sending - StrToInt((*unspent).UnspentOutputs[i].Value)
+	}
+	if sending > 0 {
+		change := StrToInt((*unspent).UnspentOutputs[i].Value) - sending
+		(*dest) = append((*dest), Destination{(*unspent).UnspentOutputs[0].Address, change})
+		i++
+	}
+	return i
+}
+
+func InputTemplate(unspent DogechainUnspent, dest []Destination, wallet crypto.Wallet, numindex int, posindex int) string {
 	var input, inputfinal bytes.Buffer
 	var i int
-	var change uint64
-	var index string
-	sending := sendvalue + fee
-	if StrToInt(balance.Balance) < sending {
-		return "saldo tidak mencukupi", StrToInt(balance.Balance)
-	} else {
-		for i = 0; sending >= StrToInt(unspent.UnspentOutputs[i].Value); i++ {
-			sending = sending - StrToInt(unspent.UnspentOutputs[i].Value)
-			input.WriteString(ReverseHex(unspent.UnspentOutputs[i].TxHash))
-			index = fmt.Sprintf("%x", unspent.UnspentOutputs[i].TxOutputN)
-			for len(index) < 8 {
-				index = "0" + index
-			}
-			input.WriteString(ReverseHex(index))
-			if scriptsig != "" {
-				input.WriteString(VarInt(len(scriptsig) / 2))
-				input.WriteString(scriptsig)
-			} else {
-				input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
-				input.WriteString(unspent.UnspentOutputs[i].Script)
-			}
-			input.WriteString("ffffffff")
+	var scriptsig, index string
+	for i = 0; i < numindex; i++ {
+		input.WriteString(ReverseHex(unspent.UnspentOutputs[i].TxHash))
+		index = fmt.Sprintf("%x", unspent.UnspentOutputs[i].TxOutputN)
+		for len(index) < 8 {
+			index = "0" + index
 		}
-		if sending > 0 {
-			change = StrToInt(unspent.UnspentOutputs[i].Value) - sending
-			input.WriteString(ReverseHex(unspent.UnspentOutputs[i].TxHash))
-			index = fmt.Sprintf("%x", unspent.UnspentOutputs[i].TxOutputN)
-			for len(index) < 8 {
-				index = "0" + index
-			}
-			input.WriteString(ReverseHex(index))
-			if scriptsig != "" {
-				input.WriteString(VarInt(len(scriptsig) / 2))
-				input.WriteString(scriptsig)
-			} else {
-				input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
-				input.WriteString(unspent.UnspentOutputs[i].Script)
-			}
-			input.WriteString("ffffffff")
-			i++
+		input.WriteString(ReverseHex(index))
+		switch {
+		case wallet != nil:
+			scriptsig = CreateSignature(unspent, dest, wallet, numindex, i)
+			input.WriteString(VarInt(len(scriptsig) / 2))
+			input.WriteString(scriptsig)
+		case (wallet == nil) && (i == posindex):
+			input.WriteString(VarInt(len(unspent.UnspentOutputs[i].Script) / 2))
+			input.WriteString(unspent.UnspentOutputs[i].Script)
+		default:
+			input.WriteString("00")
 		}
-		inputfinal.WriteString(VarInt(i))
-		inputfinal.WriteString(input.String())
-		return inputfinal.String(), change
+		input.WriteString("ffffffff")
 	}
+	inputfinal.WriteString(VarInt(i))
+	inputfinal.WriteString(input.String())
+	return inputfinal.String()
 }
 
 func OutputTemplate(dest []Destination) string {
