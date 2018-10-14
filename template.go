@@ -59,6 +59,7 @@ func ChangeUnspent(sendvalue uint64, unspent *DogechainUnspent, dest *[]Destinat
 		} else {
 			change := StrToInt((*unspent).UnspentOutputs[i].Value) - sending
 			(*dest) = append((*dest), Destination{(*unspent).UnspentOutputs[0].Address, change})
+			sending = 0
 		}
 	}
 	return i
