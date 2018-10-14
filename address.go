@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
+	crypto "github.com/alivanz/go-crypto"
 	"github.com/alivanz/go-crypto/bitcoin/base58"
 	"golang.org/x/crypto/ripemd160"
 )
@@ -37,10 +38,14 @@ func Compressed(x, y string, compress int) string {
 	return pubkey
 }
 
-func PubKeyToAddress(pubkey string) string {
-	var binaddress bytes.Buffer
+func WalletToAddress(wallet crypto.Wallet) string {
+	var binaddress, pubkey bytes.Buffer
+	wpubkey, _ := wallet.PubKey()
+	x := fmt.Sprintf("%x", wpubkey.X)
+	y := fmt.Sprintf("%x", wpubkey.Y)
+	pubkey.WriteString(Compressed(x, y, 1))
 	ripemd := ripemd160.New()
-	pubkeybyte, err := hex.DecodeString(pubkey)
+	pubkeybyte, err := hex.DecodeString(pubkey.String())
 	ErrorCheck(err)
 	firsthash := sha256.Sum256(pubkeybyte)
 	ripemd.Write(firsthash[:])

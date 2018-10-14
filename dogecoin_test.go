@@ -10,12 +10,12 @@ import (
 )
 
 func TestGetUnspentData(t *testing.T) {
-	privkey := "e105500a65cd0eda7ec6784a27a09f20c725ade74ec7d1bd96d09318d0ed43a4"
-	myaddress := "DGaL1Bm3YmWCnuz4j3BSPQZSNYGysgX9ZL"
+	privkey := "3cd0560f5b27591916c643a0b7aa69d03839380a738d2e912990dcc573715d2c"
 	privkeybin, _ := hex.DecodeString(privkey)
 	wallet, _ := bitcoin.NewWallet(privkeybin)
+	myaddress := WalletToAddress(wallet)
 	destaddress := "DPAQVCUVQU1LKRkeKihjYb2gDiHoLteSwR"
-	sendvalue := uint64(3000000000)
+	sendvalue := uint64(5000000000)
 	balance := GetBalance(myaddress)
 	log.Printf("myaddress    : %v\n", myaddress)
 	log.Printf("balance      : %v\n", balance.Balance)
