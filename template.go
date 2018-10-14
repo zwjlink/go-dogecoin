@@ -53,13 +53,13 @@ func OrderUnspent(unspent *DogechainUnspent) {
 func ChangeUnspent(sendvalue uint64, unspent *DogechainUnspent, dest *[]Destination) int {
 	var i int
 	sending := sendvalue + fee
-	for i = 0; sending >= StrToInt((*unspent).UnspentOutputs[i].Value); i++ {
-		sending = sending - StrToInt((*unspent).UnspentOutputs[i].Value)
-	}
-	if sending > 0 {
-		change := StrToInt((*unspent).UnspentOutputs[i].Value) - sending
-		(*dest) = append((*dest), Destination{(*unspent).UnspentOutputs[0].Address, change})
-		i++
+	for i = 0; sending > 0; i++ {
+		if sending >= StrToInt((*unspent).UnspentOutputs[i].Value) {
+			sending = sending - StrToInt((*unspent).UnspentOutputs[i].Value)
+		} else {
+			change := StrToInt((*unspent).UnspentOutputs[i].Value) - sending
+			(*dest) = append((*dest), Destination{(*unspent).UnspentOutputs[0].Address, change})
+		}
 	}
 	return i
 }
