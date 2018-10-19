@@ -1,4 +1,3 @@
-//update v0.9
 package dogecoin
 
 import (
@@ -35,6 +34,7 @@ type DogechainUnspent struct {
 	Success int `json:"success"`
 }
 
+// menerima jumlah saldo dari address
 func GetBalance(address string) DogechainBalance {
 	resp, err := http.Get(fmt.Sprintf("https://dogechain.info/api/v1/address/balance/%v", address))
 	ErrorCheck(err)
@@ -46,6 +46,7 @@ func GetBalance(address string) DogechainBalance {
 	return balance
 }
 
+// menerima jumlah doge yang diterima address pada transaksi terakhir kalinya
 func GetReceived(address string) DogechainReceived {
 	resp, err := http.Get(fmt.Sprintf("https://dogechain.info/api/v1/address/received/%v", address))
 	ErrorCheck(err)
@@ -57,6 +58,7 @@ func GetReceived(address string) DogechainReceived {
 	return received
 }
 
+// menerima jumlah doge yang dikirim address pada transaksi terakhir kalinya
 func GetSent(address string) DogechainSent {
 	resp, err := http.Get(fmt.Sprintf("https://dogechain.info/api/v1/address/sent/%v", address))
 	ErrorCheck(err)
@@ -68,6 +70,7 @@ func GetSent(address string) DogechainSent {
 	return sent
 }
 
+// menerima list data output dari transaksi lain yang dimiliki oleh address yang masih belum dipakai
 func GetUnspent(address string) DogechainUnspent {
 	resp, err := http.Get(fmt.Sprintf("https://dogechain.info/api/v1/unspent/%v", address))
 	ErrorCheck(err)

@@ -19,14 +19,16 @@ type broadcastdoge struct{}
 var DogeBroadcaster bitcoin.Broadcaster = broadcastdoge{}
 
 func (broadcastdoge) Broadcast(signedtx []byte) error {
+	// timeout request dari client
 	client := http.Client{
 		Timeout: 10 * time.Second,
 	}
+	// menerima data hex transaksi yang sudah di signature dalam bentuk string
 	data := make(map[string]string)
 	data["tx"] = hex.EncodeToString(signedtx)
+	// konversi data string ke format json
 	bin, _ := json.Marshal(data)
-	// data.Add("coin_symbol", "doge")
-	// data.Add("csrfmiddlewaretoken", token)
+	// push data yang sudah dikonversi ke link tujuan, sesuai format API dari blockcypher
 	request, err := http.NewRequest("POST", "https://api.blockcypher.com/v1/doge/main/txs/push", bytes.NewBuffer(bin))
 	if err != nil {
 		return err
@@ -36,12 +38,14 @@ func (broadcastdoge) Broadcast(signedtx []byte) error {
 	if err != nil {
 		return err
 	}
+	// respon jika gagal
 	if resp.StatusCode == 400 {
 		var ret map[string]string
 		msg, _ := ioutil.ReadAll(resp.Body)
 		json.Unmarshal(msg, &ret)
 		return fmt.Errorf("%s", ret["error"])
 	}
+	// respon jika berhasil
 	if resp.StatusCode != 200 {
 		io.Copy(os.Stdout, resp.Body)
 		return fmt.Errorf("Status code %d", resp.StatusCode)

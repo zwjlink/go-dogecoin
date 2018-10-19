@@ -1,4 +1,3 @@
-//update v0.9
 package dogecoin
 
 import (
@@ -22,6 +21,7 @@ const (
 	addrID         = "1e"
 )
 
+// membentuk public key dalam versi compressed-nya
 func Compressed(x, y string, compress int) string {
 	var pubkey string
 	if compress == 0 {
@@ -38,6 +38,7 @@ func Compressed(x, y string, compress int) string {
 	return pubkey
 }
 
+// membentuk address dari object wallet
 func WalletToAddress(wallet crypto.Wallet) string {
 	var binaddress, pubkey bytes.Buffer
 	wpubkey, _ := wallet.PubKey()
@@ -62,18 +63,22 @@ func WalletToAddress(wallet crypto.Wallet) string {
 	return address
 }
 
+// menampilkan networkID dari address yang sudah di-decode
 func BinAddressNetworkID(binaddress string) string {
 	return binaddress[:2]
 }
 
+// menampilkan checksum dari address yang sudah di-decode
 func BinAddressCheckSum(binaddress string) string {
 	return binaddress[42:50]
 }
 
+// menampilkan pubkeyhash dari address yang sudah di-decode
 func BinAddressPubKeyHash(binaddress string) string {
 	return binaddress[2:42]
 }
 
+// membuat scriptpubkey dari pubkeyhash yang sudah diperoleh (digunakan dalam mode transaksi pay-to-pubkey hash)
 func P2PKH(pubkeyhash string) string {
 	var p2pkh bytes.Buffer
 	p2pkh.WriteString(OP_DUP)

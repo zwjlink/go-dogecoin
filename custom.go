@@ -1,4 +1,3 @@
-//update v0.9
 package dogecoin
 
 import (
@@ -14,6 +13,7 @@ import (
 const signlim = 0x7f
 const satoshi = 100000000
 
+// mengecek dan memperbaiki value r dan s dari signature agar tidak bernilai negatif
 func SignCorrect(sign string) string {
 	for len(sign) < 64 {
 		sign = "0" + sign
@@ -26,6 +26,7 @@ func SignCorrect(sign string) string {
 	return sign
 }
 
+// memperbaiki format hex agar panjangnya bernilai genap
 func EvenCorrect(num int) string {
 	var numstring bytes.Buffer
 	if (len(fmt.Sprintf("%x", num)) % 2) > 0 {
@@ -36,6 +37,7 @@ func EvenCorrect(num int) string {
 	return numstring.String()
 }
 
+// sama seperti fungsi evencorrect, dengan penambahan prefix jika syarat batas value tertentu telah dilewati
 func VarInt(num int) string {
 	var numstring, numfinal bytes.Buffer
 	numstring.WriteString(EvenCorrect(num))
@@ -53,6 +55,7 @@ func VarInt(num int) string {
 	return numfinal.String()
 }
 
+// mengkonversi value dari doge dalam bentuk string ke dalam bentuk unsigned integer-nya
 func StrToInt(doge_value string) uint64 {
 	var value uint64
 	var err error
@@ -66,10 +69,12 @@ func StrToInt(doge_value string) uint64 {
 	return value
 }
 
+// konversi value unsigned integer dari doge ke dalam bentuk string-nya
 func IntToStr(doge_value uint64) string {
 	return fmt.Sprintf("%v.%08v", doge_value/satoshi, doge_value%satoshi)
 }
 
+// memperbaiki bagian hex tertentu dalam hex transaksi agar berada dalam format little endian
 func ReverseHex(hexa string) string {
 	bytes, err := hex.DecodeString(hexa)
 	ErrorCheck(err)
@@ -83,12 +88,14 @@ func ReverseHex(hexa string) string {
 	return reversed
 }
 
+// melakukan hash dengan algoritma sha256 sebanyak dua kali
 func Hash(data []byte) []byte {
 	hash1 := sha256.Sum256(data)
 	hash2 := sha256.Sum256(hash1[:])
 	return hash2[:]
 }
 
+// mengecek dan menampilkan error di console
 func ErrorCheck(err error) {
 	if err != nil {
 		log.Println(err)
