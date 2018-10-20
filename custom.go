@@ -5,13 +5,9 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 )
-
-const signlim = 0x7f
-const satoshi = 100000000
 
 // mengecek dan memperbaiki value r dan s dari signature agar tidak bernilai negatif
 func SignCorrect(sign string) string {
@@ -20,7 +16,7 @@ func SignCorrect(sign string) string {
 	}
 	prefix, err := strconv.ParseUint(sign[:2], 16, 64)
 	ErrorCheck(err)
-	if prefix >= signlim {
+	if prefix >= 0x7f {
 		sign = "00" + sign
 	}
 	return sign
@@ -71,7 +67,7 @@ func StrToInt(doge_value string) uint64 {
 
 // konversi value unsigned integer dari doge ke dalam bentuk string-nya
 func IntToStr(doge_value uint64) string {
-	return fmt.Sprintf("%v.%08v", doge_value/satoshi, doge_value%satoshi)
+	return fmt.Sprintf("%v.%08v", doge_value/100000000, doge_value%100000000)
 }
 
 // memperbaiki bagian hex tertentu dalam hex transaksi agar berada dalam format little endian
@@ -96,8 +92,9 @@ func Hash(data []byte) []byte {
 }
 
 // mengecek dan menampilkan error di console
-func ErrorCheck(err error) {
+func ErrorCheck(err error) error {
 	if err != nil {
-		log.Println(err)
+		return err
 	}
+	return nil
 }

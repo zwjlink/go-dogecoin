@@ -18,8 +18,20 @@ const (
 	OP_EQUALVERIFY = "88"
 	OP_CHECKSIG    = "ac"
 	OP_TRUE        = "51"
-	addrID         = "1e"
 )
+
+func GetAddress(pubkeyhash, ID string) string {
+	var binaddress bytes.Buffer
+	binaddress.WriteString(ID)
+	binaddress.WriteString(pubkeyhash)
+	binaddrnocek, err := hex.DecodeString(binaddress.String())
+	ErrorCheck(err)
+	checksum := Hash(binaddrnocek)[:4]
+	binaddress.WriteString(hex.EncodeToString(checksum))
+	binaddrbyte, err := hex.DecodeString(binaddress.String())
+	ErrorCheck(err)
+	return base58.Encode(binaddrbyte)
+}
 
 // membentuk public key dalam versi compressed-nya
 func Compressed(x, y string, compress int) string {
@@ -39,9 +51,10 @@ func Compressed(x, y string, compress int) string {
 }
 
 // membentuk address dari object wallet
-func WalletToAddress(wallet crypto.Wallet) string {
-	var binaddress, pubkey bytes.Buffer
-	wpubkey, _ := wallet.PubKey()
+func WalletToPubKeyHash(wallet crypto.Wallet) string {
+	var pubkey bytes.Buffer
+	wpubkey, err := wallet.PubKey()
+	ErrorCheck(err)
 	x := fmt.Sprintf("%x", wpubkey.X)
 	y := fmt.Sprintf("%x", wpubkey.Y)
 	pubkey.WriteString(Compressed(x, y, 1))
@@ -51,16 +64,7 @@ func WalletToAddress(wallet crypto.Wallet) string {
 	firsthash := sha256.Sum256(pubkeybyte)
 	ripemd.Write(firsthash[:])
 	pubkeyhash := ripemd.Sum(nil)
-	binaddress.WriteString(addrID)
-	binaddress.WriteString(hex.EncodeToString(pubkeyhash))
-	binaddrnocek, err := hex.DecodeString(binaddress.String())
-	ErrorCheck(err)
-	checksum := Hash(binaddrnocek)[:4]
-	binaddress.WriteString(hex.EncodeToString(checksum))
-	binaddrbyte, err := hex.DecodeString(binaddress.String())
-	ErrorCheck(err)
-	address := base58.Encode(binaddrbyte)
-	return address
+	return hex.EncodeToString(pubkeyhash)
 }
 
 // menampilkan networkID dari address yang sudah di-decode

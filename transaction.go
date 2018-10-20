@@ -9,20 +9,19 @@ import (
 )
 
 const (
-	version  = "01000000"
 	locktime = "00000000"
 	sighash  = "01000000"
 )
 
 // membuat signature
-func CreateSignature(unspent DogechainUnspent, dest []Destination, wallet crypto.Wallet, numindex int, posindex int) string {
+func CreateSignature(coindata Coin, dest []Destination, wallet crypto.Wallet, numindex int, posindex int) string {
 	var rawtx, pubkey bytes.Buffer
 	// membuat hex input untuk hex transaksi raw
-	inputstr := InputTemplate(unspent, nil, nil, numindex, posindex)
+	inputstr := InputTemplate(coindata, nil, nil, numindex, posindex)
 	// membuat hex output untuk hex transaksi raw
 	outputstr := OutputTemplate(dest)
 	// pembentukan hex transaksi raw
-	rawtx.WriteString(version)
+	rawtx.WriteString(coindata.version)
 	rawtx.WriteString(inputstr)
 	rawtx.WriteString(outputstr)
 	rawtx.WriteString(locktime)
@@ -48,14 +47,14 @@ func CreateSignature(unspent DogechainUnspent, dest []Destination, wallet crypto
 	return scriptsig
 }
 
-func CreateSignedTransaction(unspent DogechainUnspent, dest []Destination, wallet crypto.Wallet, numindex int) string {
+func CreateSignedTransaction(coindata Coin, dest []Destination, wallet crypto.Wallet, numindex int) string {
 	var signedtx bytes.Buffer
 	// menbentuk hex input untuk hex transaksi yang di signature
-	inputstr := InputTemplate(unspent, dest, wallet, numindex, -1)
+	inputstr := InputTemplate(coindata, dest, wallet, numindex, -1)
 	// menbentuk hex output untuk hex transaksi yang di signature
 	outputstr := OutputTemplate(dest)
 	// pembentukan hex transaksi yang sudah di signature
-	signedtx.WriteString(version)
+	signedtx.WriteString(coindata.version)
 	signedtx.WriteString(inputstr)
 	signedtx.WriteString(outputstr)
 	signedtx.WriteString(locktime)

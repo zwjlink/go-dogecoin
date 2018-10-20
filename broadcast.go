@@ -2,7 +2,6 @@ package dogecoin
 
 import (
 	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,34 +9,23 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/alivanz/go-crypto/bitcoin"
 )
 
-type broadcastdoge struct{}
-
-var DogeBroadcaster bitcoin.Broadcaster = broadcastdoge{}
-
-func (broadcastdoge) Broadcast(signedtx []byte) error {
-	// timeout request dari client
+func (doge Doge) Broadcast(signtx string) error {
 	client := http.Client{
 		Timeout: 10 * time.Second,
 	}
 	// menerima data hex transaksi yang sudah di signature dalam bentuk string
 	data := make(map[string]string)
-	data["tx"] = hex.EncodeToString(signedtx)
+	data["tx"] = signtx
 	// konversi data string ke format json
 	bin, _ := json.Marshal(data)
 	// push data yang sudah dikonversi ke link tujuan, sesuai format API dari blockcypher
 	request, err := http.NewRequest("POST", "https://api.blockcypher.com/v1/doge/main/txs/push", bytes.NewBuffer(bin))
-	if err != nil {
-		return err
-	}
+	ErrorCheck(err)
 	request.Header.Add("Content-Type", "text/json")
 	resp, err := client.Do(request)
-	if err != nil {
-		return err
-	}
+	ErrorCheck(err)
 	// respon jika gagal
 	if resp.StatusCode == 400 {
 		var ret map[string]string

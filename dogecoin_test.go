@@ -11,51 +11,73 @@ import (
 func TestGetUnspentData(t *testing.T) {
 	// mendefinisikan private key awal yang akan digunakan
 	privkey := "e105500a65cd0eda7ec6784a27a09f20c725ade74ec7d1bd96d09318d0ed43a4"
+	// privkey := "3cd0560f5b27591916c643a0b7aa69d03839380a738d2e912990dcc573715d2c"
+
 	// konversi private key ke object wallet yang berisi pasangan private key dan public key
-	privkeybin, _ := hex.DecodeString(privkey)
-	wallet, _ := bitcoin.NewWallet(privkeybin)
-	// membentuk address dari public key yang diperoleh dari object wallet
-	myaddress := WalletToAddress(wallet)
-	// address tujuan dan jumlah yang ingin dikirimkan
-	destaddress := "DPAQVCUVQU1LKRkeKihjYb2gDiHoLteSwR"
-	sendvalue := uint64(2362500000)
-	// mengambil data saldo dari address user
-	balance := GetBalance(myaddress)
-	// menampilkan data address dan saldo user, serta address tujuan dan destinasi di console
-	log.Printf("myaddress    : %v\n", myaddress)
-	log.Printf("balance      : %v\n", balance.Balance)
-	log.Printf("destination  : %v\n", destaddress)
-	log.Printf("sendvalue    : %v\n", IntToStr(sendvalue))
-	// mengambil list data output dari transaksi lain yang dimiliki oleh user yang masih belum dipakai
-	unspent := GetUnspent(myaddress)
-	// mengurutkan list data output dari yang memiliki value terbesar hingga yang terkecil
-	OrderUnspent(&unspent)
+	privkeybin, err := hex.DecodeString(privkey)
+	ErrorCheck(err)
+	wallet, err := bitcoin.NewWallet(privkeybin)
+	ErrorCheck(err)
+
+	// membentuk pubkeyhash dari object wallet
+	pubkeyhash := WalletToPubKeyHash(wallet)
+
+	// membentuk data coin cryptocurrency dari pubkeyhash
+	var coin Doge
+	coindata := coin.CreateCoin(pubkeyhash)
+
+	// menampilkan data address dan saldo user
+	log.Printf("myaddress    : %v\n", coindata.address)
+	log.Printf("balance      : %v\n", coindata.balance)
+
+	// menampilkan list data output dari transaksi lain yang dimiliki oleh user yang masih belum dipakai dari value terbesar hingga terkecil
+	for _, row := range coindata.unspent {
+		log.Printf("%v %v %v", row.TxHash, row.TxOutputN, row.Value)
+	}
+
 	// membuat array dari tipe bentukan "Destination", yang berisi address tujuan dan jumlah yang ingin dikirimkan
 	dest := make([]Destination, 0)
-	// menambah elemen array dari address tujuan yang telah didefinisikan sebelumnya
-	dest = append(dest, Destination{destaddress, sendvalue})
+
+	// // menambah elemen array dari address tujuan yang telah didefinisikan sebelumnya
+	// dest = append(dest, Destination{"DUJ4EoqvPAzCpJBACQa6vYuQpcv9FSHF5d", uint64(450000000)})
+	// dest = append(dest, Destination{"DPAQVCUVQU1LKRkeKihjYb2gDiHoLteSwR", uint64(300000000)})
+
+	//splitter
+	dest = append(dest, Destination{coindata.address, uint64(900000000)})
+	dest = append(dest, Destination{coindata.address, uint64(650000000)})
+
+	// menampilkan list address tujuan dan jumlah yang dikirimkan
+	var sendvalue uint64
+	for _, outaddr := range dest {
+		log.Printf("Destination : %v , Value : %v\n", outaddr.Address, outaddr.Value)
+		sendvalue = sendvalue + outaddr.Value
+	}
+
 	// menghitung total fee dan jumlah list output yang dipakai untuk pengiriman sejumlah doge yang telah didefinisikan
 	// serta menambah elemen array destinasi yang baru ke address user jika ada kembalian doge yang perlu dibayar ke user
-	totalfee, numindex := ChangeUnspent(sendvalue, unspent, &dest, myaddress)
-	// menampilkan total fee dari proses transaksi
+	totalfee, numindex := ChangeUnspent(coindata, sendvalue, &dest)
+
+	// menampilkan total fee dan jumlah unspent yg dipakaidari proses transaksi
 	log.Printf("totalfee     : %v\n", IntToStr(totalfee))
+	log.Printf("used_unspent : %v\n", numindex)
+
 	// mengecek apakah jumlah saldo masih mencukupi, jika iya, proses pembuatan hex transaksi dijalankan
-	if StrToInt(balance.Balance) >= (sendvalue + totalfee) {
+	if coindata.balance >= (sendvalue + totalfee) {
+
 		// membuat hex transaksi yang sudah di signature
-		signtx := CreateSignedTransaction(unspent, dest, wallet, numindex)
+		signtx := CreateSignedTransaction(coindata, dest, wallet, numindex)
+
 		// menampilkan hex transaksi yang sudah di signature di console
 		log.Printf("signtxhex    : %v\n", signtx)
-		// konversi hex transaksi yang sudah di signature ke dalam tipe byte untuk keperluan broadcasting
-		bin, _ := hex.DecodeString(signtx)
-		if err := DogeBroadcaster.Broadcast(bin); err != nil {
-			log.Print(err)
-			t.Fail()
-			return
-		}
-		// jika jumlah saldo tidak mencukupi jumlah pembayaran beserta total fee, menampilkan keterangan di console
-	} else if StrToInt(balance.Balance) >= sendvalue {
+
+		// broadcast transaksi
+		ErrorCheck(coin.Broadcast(signtx))
+
+		// jika jumlah saldo tidak mencukupi jumlah pembayaran beserta total fee
+	} else if coindata.balance >= sendvalue {
 		log.Printf("total fee belum melewati batas minimum, transaksi tidak dapat dilakukan\n")
-		// jika jumlah saldo lebih kecil dari jumlah pembayaran, menampilkan keterangan di console
+
+		// jika jumlah saldo lebih kecil dari jumlah pembayaran
 	} else {
 		log.Printf("saldo tidak mencukupi, transaksi tidak dapat dilakukan\n")
 	}
