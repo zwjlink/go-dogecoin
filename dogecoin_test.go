@@ -10,8 +10,18 @@ import (
 
 func TestGetUnspentData(t *testing.T) {
 	// mendefinisikan private key awal yang akan digunakan
-	privkey := "e105500a65cd0eda7ec6784a27a09f20c725ade74ec7d1bd96d09318d0ed43a4"
-	// privkey := "3cd0560f5b27591916c643a0b7aa69d03839380a738d2e912990dcc573715d2c"
+
+	/*address : DPAQVCUVQU1LKRkeKihjYb2gDiHoLteSwR*/
+	// privkey := WIFtoPrivKey("QQ5bFuoytx3CawBrsZeXNkW32MPxQvd2W95QeCqk13G7yWYecJoD")
+
+	// /*address : DUJ4EoqvPAzCpJBACQa6vYuQpcv9FSHF5d*/
+	// privkey := WIFtoPrivKey("QVBG5ywrW8nxfZWEFK7q9Jgi55SqjiMf1Fs275VLhd76Ta9VhwYp")
+
+	// /*address : DGaL1Bm3YmWCnuz4j3BSPQZSNYGysgX9ZL*/
+	// privkey := "e105500a65cd0eda7ec6784a27a09f20c725ade74ec7d1bd96d09318d0ed43a4"
+
+	// /*address : DK9m4nYAaZHoYRkW7eZzjNLTgHdjpMEmkm*/
+	privkey := "3cd0560f5b27591916c643a0b7aa69d03839380a738d2e912990dcc573715d2c"
 
 	// konversi private key ke object wallet yang berisi pasangan private key dan public key
 	privkeybin, err := hex.DecodeString(privkey)

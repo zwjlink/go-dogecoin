@@ -93,3 +93,9 @@ func P2PKH(pubkeyhash string) string {
 	p2pkh.WriteString(OP_CHECKSIG)
 	return p2pkh.String()
 }
+
+func WIFtoPrivKey(WIF string) string {
+	privkeybyte, err := base58.Decode(WIF)
+	ErrorCheck(err)
+	return hex.EncodeToString(privkeybyte[1:33])
+}
