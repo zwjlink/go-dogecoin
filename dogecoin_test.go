@@ -49,7 +49,7 @@ func TestTransaction(t *testing.T) {
 		// menampilkan hex transaksi yang sudah di signature di console
 		log.Printf("signtxhex    : %v\n", signtx)
 		// broadcast transaksi
-		coin.Broadcast(signtx)
+		// coin.Broadcast(signtx)
 		// jika jumlah saldo tidak mencukupi jumlah pembayaran beserta total fee
 	} else if coindata.balance >= sendvalue {
 		log.Printf("total fee belum melewati batas minimum, transaksi tidak dapat dilakukan\n")
