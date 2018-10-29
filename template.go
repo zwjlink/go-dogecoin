@@ -41,25 +41,26 @@ func ChangeUnspent(coindata Coin, sendvalue uint64, dest *[]Destination) (uint64
 	totalfee := outfee * uint64(len(*dest))
 	sending := sendvalue + totalfee
 	for i = 0; i < len(coindata.unspent); i++ {
-		if sending >= (coindata.unspent[i].Value - (infee + outfee)) {
-			if sending >= (coindata.unspent[i].Value - infee) {
-				totalfee = totalfee + infee
+		totalfee = totalfee + infee
+		if coindata.unspent[i].Value > infee {
+			switch {
+			case sending >= (coindata.unspent[i].Value - infee):
 				sending = sending - (coindata.unspent[i].Value - infee)
 				if sending == 0 {
 					i++
 					return totalfee, i
 				}
-			} else {
-				totalfee = totalfee + (coindata.unspent[i].Value - sending)
+			case sending >= (coindata.unspent[i].Value - (infee + outfee)):
+				totalfee = totalfee + (coindata.unspent[i].Value - sending) - infee
+				i++
+				return totalfee, i
+			default:
+				totalfee = totalfee + outfee
+				change := (coindata.unspent[i].Value - (infee + outfee)) - sending
+				(*dest) = append((*dest), Destination{coindata.address, change})
 				i++
 				return totalfee, i
 			}
-		} else {
-			totalfee = totalfee + infee + outfee
-			change := (coindata.unspent[i].Value - (infee + outfee)) - sending
-			(*dest) = append((*dest), Destination{coindata.address, change})
-			i++
-			return totalfee, i
 		}
 	}
 	return totalfee, i

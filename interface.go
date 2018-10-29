@@ -1,10 +1,9 @@
 package dogecoin
 
 type Currency interface {
-	GetBalance(address string) uint64
-	GetUnspent(address string) []Unspent
-	Broadcast(signtx string) error
 	CreateCoin(pubkeyhash string) Coin
+	Broadcast(signtx string) error
 }
 
 type Doge struct{}
+type Dash struct{}

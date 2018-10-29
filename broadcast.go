@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func (doge Doge) Broadcast(signtx string) error {
+func Broadcasting(coin string, signtx string) error {
 	client := http.Client{
 		Timeout: 10 * time.Second,
 	}
@@ -20,10 +20,12 @@ func (doge Doge) Broadcast(signtx string) error {
 	data["tx"] = signtx
 	// konversi data string ke format json
 	bin, _ := json.Marshal(data)
-	// push data yang sudah dikonversi ke link tujuan, sesuai format API dari blockcypher
-	request, err := http.NewRequest("POST", "https://api.blockcypher.com/v1/doge/main/txs/push", bytes.NewBuffer(bin))
+	// request push ke link tujuan, sesuai dokumentasi API dari blockcypher
+	request, err := http.NewRequest("POST", fmt.Sprintf("https://api.blockcypher.com/v1/%v/main/txs/push", coin), bytes.NewBuffer(bin))
 	ErrorCheck(err)
+	// just header, not necessary
 	request.Header.Add("Content-Type", "text/json")
+	// send the request to the link and return the link response
 	resp, err := client.Do(request)
 	ErrorCheck(err)
 	// respon jika gagal
