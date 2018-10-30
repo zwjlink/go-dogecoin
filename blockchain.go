@@ -70,7 +70,7 @@ func GetBlockCypherChain(coin string, address string) (uint64, []Unspent) {
 	client := &http.Client{
 		Timeout: 3 * time.Second,
 	}
-	req, _ := http.NewRequest("GET", fmt.Sprintf("http://api.blockcypher.com/v1/%v/main/addrs/%v?unspentOnly=true", coin, address), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.blockcypher.com/v1/%v/main/addrs/%v?unspentOnly=true", coin, address), nil)
 	resp, err := client.Do(req)
 	// if no response for a given time, then go to dogechain
 	if err != nil {
