@@ -22,9 +22,9 @@ func TestTransaction(t *testing.T) {
 	var coin Doge
 	coindata := coin.CreateCoin(pubkeyhash)
 	// menampilkan data address dan saldo user
-	log.Printf("myaddress    : %v\n", coindata.address)
-	log.Printf("balance      : %v\n", IntToStr(coindata.balance))
-	for _, row := range coindata.unspent {
+	log.Printf("myaddress    : %v\n", coindata.Address)
+	log.Printf("balance      : %v\n", IntToStr(coindata.Balance))
+	for _, row := range coindata.Unspent {
 		log.Printf("%v %v %v", row.TxHash, row.TxOutputN, row.Value)
 	}
 	// membuat array dari tipe bentukan "Destination", yang berisi address tujuan dan jumlah yang ingin dikirimkan
@@ -40,10 +40,10 @@ func TestTransaction(t *testing.T) {
 	// menghitung total fee dan jumlah list output yang dipakai untuk pengiriman sejumlah doge yang telah didefinisikan
 	// serta menambah elemen array destinasi yang baru ke address user jika ada kembalian doge yang perlu dibayar ke user
 	totalfee, numindex := ChangeUnspent(coindata, sendvalue, &dest)
-	// menampilkan total fee dan jumlah unspent yg dipakaidari proses transaksi
+	// menampilkan total fee dan jumlah unspent yg dipakai dari proses transaksi
 	log.Printf("totalfee     : %v\n", IntToStr(totalfee))
 	// mengecek apakah jumlah saldo masih mencukupi, jika iya, proses pembuatan hex transaksi dijalankan
-	if coindata.balance >= (sendvalue + totalfee) {
+	if coindata.Balance >= (sendvalue + totalfee) {
 		// membuat hex transaksi yang sudah di signature
 		signtx := CreateSignedTransaction(coindata, dest, wallet, numindex)
 		// menampilkan hex transaksi yang sudah di signature di console
@@ -51,7 +51,7 @@ func TestTransaction(t *testing.T) {
 		// broadcast transaksi
 		// coin.Broadcast(signtx)
 		// jika jumlah saldo tidak mencukupi jumlah pembayaran beserta total fee
-	} else if coindata.balance >= sendvalue {
+	} else if coindata.Balance >= sendvalue {
 		log.Printf("total fee belum melewati batas minimum, transaksi tidak dapat dilakukan\n")
 		// jika jumlah saldo lebih kecil dari jumlah pembayaran
 	} else {

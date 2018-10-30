@@ -1,26 +1,20 @@
 package dogecoin
 
-// in USD satoshi
-// find a link to convert USD fee to Doge fee
-const USDfeeDoge = float64(100000)
-
 type Coin struct {
-	ID      string
-	version string
-	fee     uint64
-	address string
-	balance uint64
-	unspent []Unspent
+	Version string
+	Fee     uint64
+	Address string
+	Balance uint64
+	Unspent []Unspent
 }
 
 func (doge Doge) CreateCoin(pubkeyhash string) Coin {
 	var dogecoin Coin
-	dogecoin.ID = "1e"
-	dogecoin.version = "01000000"
-	// initial dogefee is 0.25 doge
-	dogecoin.fee = USDBasedFee(USDfeeDoge)
-	dogecoin.address = GetAddress(pubkeyhash, dogecoin.ID)
-	dogecoin.balance, dogecoin.unspent = GetBlockCypherChain("doge", dogecoin.address)
+	dogecoin.Version = "01000000"
+	// initial dogefee per approximately 150 character or one output is 0.25 doge, input value of fee in USD satoshi
+	dogecoin.Fee = USDBasedFee("74", float64(100000))
+	dogecoin.Address = GetAddress(pubkeyhash, "1e")
+	dogecoin.Balance, dogecoin.Unspent = GetBlockCypherChain("doge", dogecoin.Address)
 	return dogecoin
 }
 

@@ -12,7 +12,7 @@ import (
 )
 
 func Broadcasting(coin string, signtx string) error {
-	client := http.Client{
+	client := &http.Client{
 		Timeout: 10 * time.Second,
 	}
 	// menerima data hex transaksi yang sudah di signature dalam bentuk string

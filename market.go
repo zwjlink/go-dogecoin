@@ -2,6 +2,7 @@ package dogecoin
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -16,8 +17,8 @@ type Market struct {
 	} `json:"data"`
 }
 
-func USDBasedFee(USDfee float64) uint64 {
-	resp, err := http.Get("https://api.coinmarketcap.com/v2/ticker/74/?convert=USD")
+func USDBasedFee(coinID string, USDfee float64) uint64 {
+	resp, err := http.Get(fmt.Sprintf("https://api.coinmarketcap.com/v2/ticker/%v/?convert=USD", coinID))
 	ErrorCheck(err)
 	data, err := ioutil.ReadAll(resp.Body)
 	ErrorCheck(err)

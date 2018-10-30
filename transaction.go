@@ -21,7 +21,7 @@ func CreateSignature(coindata Coin, dest []Destination, wallet crypto.Wallet, nu
 	// membuat hex output untuk hex transaksi raw
 	outputstr := OutputTemplate(dest)
 	// pembentukan hex transaksi raw
-	rawtx.WriteString(coindata.version)
+	rawtx.WriteString(coindata.Version)
 	rawtx.WriteString(inputstr)
 	rawtx.WriteString(outputstr)
 	rawtx.WriteString(locktime)
@@ -54,7 +54,7 @@ func CreateSignedTransaction(coindata Coin, dest []Destination, wallet crypto.Wa
 	// menbentuk hex output untuk hex transaksi yang di signature
 	outputstr := OutputTemplate(dest)
 	// pembentukan hex transaksi yang sudah di signature
-	signedtx.WriteString(coindata.version)
+	signedtx.WriteString(coindata.Version)
 	signedtx.WriteString(inputstr)
 	signedtx.WriteString(outputstr)
 	signedtx.WriteString(locktime)

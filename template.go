@@ -36,28 +36,28 @@ func OrderUnspent(unspent *[]Unspent) {
 // serta menambah elemen array destinasi "dest" yang baru ke address pengirim jika ada kembalian doge yang perlu dibayar ke address pengirim
 func ChangeUnspent(coindata Coin, sendvalue uint64, dest *[]Destination) (uint64, int) {
 	var i int
-	outfee := coindata.fee
+	outfee := coindata.Fee
 	infee := 2 * outfee
 	totalfee := outfee * uint64(len(*dest))
 	sending := sendvalue + totalfee
-	for i = 0; i < len(coindata.unspent); i++ {
+	for i = 0; i < len(coindata.Unspent); i++ {
 		totalfee = totalfee + infee
-		if coindata.unspent[i].Value > infee {
+		if coindata.Unspent[i].Value > infee {
 			switch {
-			case sending >= (coindata.unspent[i].Value - infee):
-				sending = sending - (coindata.unspent[i].Value - infee)
+			case sending >= (coindata.Unspent[i].Value - infee):
+				sending = sending - (coindata.Unspent[i].Value - infee)
 				if sending == 0 {
 					i++
 					return totalfee, i
 				}
-			case sending >= (coindata.unspent[i].Value - (infee + outfee)):
-				totalfee = totalfee + (coindata.unspent[i].Value - sending) - infee
+			case sending >= (coindata.Unspent[i].Value - (infee + outfee)):
+				totalfee = totalfee + (coindata.Unspent[i].Value - sending) - infee
 				i++
 				return totalfee, i
 			default:
 				totalfee = totalfee + outfee
-				change := (coindata.unspent[i].Value - (infee + outfee)) - sending
-				(*dest) = append((*dest), Destination{coindata.address, change})
+				change := (coindata.Unspent[i].Value - (infee + outfee)) - sending
+				(*dest) = append((*dest), Destination{coindata.Address, change})
 				i++
 				return totalfee, i
 			}
@@ -78,9 +78,9 @@ func InputTemplate(coindata Coin, dest []Destination, wallet crypto.Wallet, numi
 	var scriptsig, index string
 	for i = 0; i < numindex; i++ {
 		// hash transaksi sebelumnya
-		input.WriteString(ReverseHex(coindata.unspent[i].TxHash))
+		input.WriteString(ReverseHex(coindata.Unspent[i].TxHash))
 		// index input (atau output yang tidak dipakai pada transaksi sebelumnya)
-		index = fmt.Sprintf("%x", coindata.unspent[i].TxOutputN)
+		index = fmt.Sprintf("%x", coindata.Unspent[i].TxOutputN)
 		for len(index) < 8 {
 			index = "0" + index
 		}
@@ -96,8 +96,8 @@ func InputTemplate(coindata Coin, dest []Destination, wallet crypto.Wallet, numi
 		// jika input wallet tidak terdeteksi, namun index input yang dipakai sama dengan posindex,
 		// maka scriptpubkey diletakkan pada input tersebut
 		case (wallet == nil) && (i == posindex):
-			input.WriteString(VarInt(len(coindata.unspent[i].Script) / 2))
-			input.WriteString(coindata.unspent[i].Script)
+			input.WriteString(VarInt(len(coindata.Unspent[i].Script) / 2))
+			input.WriteString(coindata.Unspent[i].Script)
 		// kondisi jika input wallet tidak terdeteksi dan juga index input masih belum sesuai dengan posindex, scriptsig dibiarkan kosong
 		default:
 			input.WriteString("00")
