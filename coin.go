@@ -21,3 +21,16 @@ func (doge Doge) CreateCoin(pubkeyhash string) Coin {
 func (doge Doge) Broadcast(signtx string) {
 	ErrorCheck(Broadcasting("doge", signtx))
 }
+
+func (dash Dash) CreateCoin(pubkeyhash string) Coin {
+	var dashcoin Coin
+	dashcoin.Version = "02000000"
+	dashcoin.Fee = USDBasedFee("131", float64(3000000))
+	dashcoin.Address = GetAddress(pubkeyhash, "4c")
+	dashcoin.Balance, dashcoin.Unspent = GetBlockCypherChain("dash", dashcoin.Address)
+	return dashcoin
+}
+
+func (dash Dash) Broadcast(signtx string) {
+	ErrorCheck(Broadcasting("dash", signtx))
+}
