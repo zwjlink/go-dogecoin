@@ -30,10 +30,10 @@ func CreateSignature(coindata Coin, dest []Destination, wallet crypto.Wallet, nu
 	rawtxbyte, _ := hex.DecodeString(rawtx.String())
 	// melakukan hashing pada hex transaksi raw sehingga diperoleh hash transaksi raw
 	rawtxhash := Hash(rawtxbyte)
-	// signature dilakukan pada hash transaksi raw, sehingga diperoleh komponen signature r dan s
-	r, s, _ := wallet.Sign(rawtxhash)
 	// mengambil pubkey yang belum dikompresi dari object wallet
 	wpubkey, _ := wallet.PubKey()
+	// signature dilakukan pada hash transaksi raw, sehingga diperoleh komponen signature r dan s
+	r, s, _ := wallet.Sign(rawtxhash)
 	// koreksi komponen r dan s untuk mencegah nilai negatif
 	r_correct := SignCorrect(fmt.Sprintf("%x", r))
 	s_correct := SignCorrect(fmt.Sprintf("%x", s))
